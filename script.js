@@ -43,4 +43,3 @@ setInterval(() => {
   gramas += gramasPorSegundo;
   updateCounter();
 }, 1000);
-
