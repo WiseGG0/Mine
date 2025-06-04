@@ -1,63 +1,117 @@
-let gramas = 0;
-let gramasPorSegundo = 0;
-
-const counter = document.getElementById("counter");
-const grassBlock = document.getElementById("grassBlock");
-const upgradesDiv = document.getElementById("upgrades");
-
-// Clique principal
-grassBlock.addEventListener("click", () => {
-  gramas++;
-  updateCounter();
-});
-
-// Atualiza o contador
-function updateCounter() {
-  counter.textContent = `Gramas: ${gramas}`;
-}
-
-// Upgrades
-const upgrades = [
-  { nome: "Pá automática", custo: 10, valor: 1 },
-  { nome: "Aldeão Mineiro", custo: 50, valor: 5 },
-  { nome: "Cortador de Grama", custo: 200, valor: 20 }
+const resources = [
+  {
+    name: "Grama",
+    key: "grama",
+    image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/3/3c/Grass_Block_JE5_BE5.png",
+    unlocked: true,
+    amount: 0,
+    auto: 0,
+    clickPower: 1,
+    unlockCost: 0
+  },
+  {
+    name: "Madeira",
+    key: "madeira",
+    image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/5/5e/Oak_Log.png",
+    unlocked: false,
+    amount: 0,
+    auto: 0,
+    clickPower: 1,
+    unlockCost: 1000,
+    unlockDependency: "grama"
+  },
+  {
+    name: "Pedra",
+    key: "pedra",
+    image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/8/89/Stone_JE3_BE3.png",
+    unlocked: false,
+    amount: 0,
+    auto: 0,
+    clickPower: 1,
+    unlockCost: 5000,
+    unlockDependency: "madeira"
+  },
+  {
+    name: "Cobre",
+    key: "cobre",
+    image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/f/f0/Block_of_Raw_Copper_JE2_BE2.png",
+    unlocked: false,
+    amount: 0,
+    auto: 0,
+    clickPower: 1,
+    unlockCost: 10000,
+    unlockDependency: "pedra"
+  },
+  {
+    name: "Ferro",
+    key: "ferro",
+    image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/b/b1/Block_of_Raw_Iron_JE2_BE2.png",
+    unlocked: false,
+    amount: 0,
+    auto: 0,
+    clickPower: 1,
+    unlockCost: 25000,
+    unlockDependency: "cobre"
+  }
 ];
 
-upgrades.forEach((upgrade) => {
-  const btn = document.createElement("button");
-  btn.textContent = `${upgrade.nome} (${upgrade.custo})`;
-  btn.onclick = () => {
-    if (gramas >= upgrade.custo) {
-      gramas -= upgrade.custo;
-      gramasPorSegundo += upgrade.valor;
-      upgrade.custo = Math.floor(upgrade.custo * 1.5);
-      btn.textContent = `${upgrade.nome} (${upgrade.custo})`;
-      updateCounter();
+function createResourceElement(resource) {
+  const div = document.createElement("div");
+  div.className = "resource";
+  div.id = resource.key;
+
+  const icon = document.createElement("div");
+  icon.className = "clickable";
+  icon.style.backgroundImage = `url(${resource.image})`;
+  icon.ontouchstart = icon.onclick = () => {
+    resource.amount += resource.clickPower;
+    update();
+  };
+  div.appendChild(icon);
+
+  const label = document.createElement("p");
+  label.textContent = `${resource.name}: ${resource.amount}`;
+  label.id = `${resource.key}-count`;
+  div.appendChild(label);
+
+  const upgradeBtn = document.createElement("button");
+  upgradeBtn.textContent = `Upgrade automático (+1/s) - Custa 50`;
+  upgradeBtn.onclick = () => {
+    if (resource.amount >= 50) {
+      resource.amount -= 50;
+      resource.auto += 1;
+      update();
     }
   };
-  upgradesDiv.appendChild(btn);
-});
+  div.appendChild(upgradeBtn);
 
-// Loop automático
-setInterval(() => {
-  gramas += gramasPorSegundo;
-  updateCounter();
-}, 1000);
-const achievements = [
-  { gramas: 10, texto: "Primeiras 10 gramas 🌿" },
-  { gramas: 100, texto: "100 gramas colhidas! 🌾" },
-  { gramas: 500, texto: "Você é um fazendeiro nato! 🧑‍🌾" }
-];
-
-const unlocked = [];
-
-function checkAchievements() {
-  achievements.forEach((a) => {
-    if (gramas >= a.gramas && !unlocked.includes(a.texto)) {
-      unlocked.push(a.texto);
-      const div = document.createElement("div");
-      div.textContent = `🏆 ${a.texto}`;
-      document.getElementById("achievements").appendChild(div);
-    }
-  });
+  return div;
 }
+
+function update() {
+  const container = document.getElementById("resources");
+  container.innerHTML = "";
+
+  for (let res of resources) {
+    if (!res.unlocked && res.unlockDependency) {
+      const dep = resources.find(r => r.key === res.unlockDependency);
+      if (dep.amount >= res.unlockCost) {
+        res.unlocked = true;
+      }
+    }
+
+    if (res.unlocked) {
+      const el = createResourceElement(res);
+      container.appendChild(el);
+    }
+  }
+}
+
+setInterval(() => {
+  for (let res of resources) {
+    res.amount += res.auto;
+  }
+  update();
+}, 1000);
+
+update();
