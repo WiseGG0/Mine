@@ -1,38 +1,91 @@
-body {
+* {
+  box-sizing: border-box;
   margin: 0;
   padding: 0;
-  background-color: #d0f0c0;
-  font-family: 'Arial', sans-serif;
+}
+
+body {
+  background: #a4d07e;
+  font-family: 'Verdana', sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 20px;
   text-align: center;
 }
 
-#ui {
-  position: absolute;
-  top: 10px;
-  left: 0;
-  width: 100%;
-  color: #2e7d32;
-  z-index: 2;
+h1 {
+  font-size: 2em;
+  margin-bottom: 20px;
+  color: #2b3e1f;
 }
 
-canvas {
-  display: block;
-  margin: 0 auto;
-  touch-action: manipulation;
+#game {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
 }
-button {
-  padding: 10px 20px;
-  font-size: 16px;
-  margin-top: 10px;
-  border: none;
-  background-color: #4caf50;
-  color: white;
-  border-radius: 8px;
+
+#grassBlock {
+  width: 50vw;
+  max-width: 200px;
+  min-width: 120px;
+  height: auto;
   cursor: pointer;
+  border-radius: 12px;
+  transition: transform 0.1s;
 }
 
-button:disabled {
-  background-color: #a5d6a7;
-  cursor: not-allowed;
+#grassBlock:active {
+  transform: scale(0.95);
 }
+
+#counter {
+  font-size: 1.5em;
+  margin-top: 10px;
+  color: #1f2917;
+}
+
+#upgrades {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  max-width: 300px;
+}
+
+button {
+  padding: 12px;
+  font-size: 1em;
+  border: none;
+  border-radius: 8px;
+  background: #3c6e37;
+  color: white;
+  box-shadow: 0 4px 0 #2b4d27;
+  transition: background 0.2s, transform 0.1s;
+}
+
+button:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 #2b4d27;
+}
+
+@media (max-width: 400px) {
+  h1 {
+    font-size: 1.5em;
+  }
+
+  #counter {
+    font-size: 1.2em;
+  }
+
+  button {
+    font-size: 0.9em;
+    padding: 10px;
+  }
+}
+
 
