@@ -1,20 +1,45 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Mine Clicker</title>
-  <link rel="stylesheet" href="style.css" />
-</head>
-<body>
-  <h1>Mine Clicker</h1>
-  <div id="prestige-info"></div>
-  <div id="resources"></div>
-  <h2>Loja</h2>
-  <div id="shop"></div>
-  <h2>Conquistas</h2>
-  <ul id="achievements"></ul>
-  <button onclick="resetGame()">Resetar Progresso</button>
-  <script src="script.js"></script>
-</body>
-</html>
+let gramas = 0;
+let gramasPorSegundo = 0;
+
+const counter = document.getElementById("counter");
+const grassBlock = document.getElementById("grassBlock");
+const upgradesDiv = document.getElementById("upgrades");
+
+// Clique principal
+grassBlock.addEventListener("click", () => {
+  gramas++;
+  updateCounter();
+});
+
+// Atualiza o contador
+function updateCounter() {
+  counter.textContent = `Gramas: ${gramas}`;
+}
+
+// Upgrades
+const upgrades = [
+  { nome: "Pá automática", custo: 10, valor: 1 },
+  { nome: "Aldeão Mineiro", custo: 50, valor: 5 },
+  { nome: "Cortador de Grama", custo: 200, valor: 20 }
+];
+
+upgrades.forEach((upgrade, index) => {
+  const btn = document.createElement("button");
+  btn.textContent = `${upgrade.nome} (${upgrade.custo})`;
+  btn.onclick = () => {
+    if (gramas >= upgrade.custo) {
+      gramas -= upgrade.custo;
+      gramasPorSegundo += upgrade.valor;
+      upgrade.custo = Math.floor(upgrade.custo * 1.5);
+      btn.textContent = `${upgrade.nome} (${upgrade.custo})`;
+      updateCounter();
+    }
+  };
+  upgradesDiv.appendChild(btn);
+});
+
+// Loop automático
+setInterval(() => {
+  gramas += gramasPorSegundo;
+  updateCounter();
+}, 1000);
