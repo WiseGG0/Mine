@@ -1,32 +1,46 @@
-let grassImage;
-let counter = 0;
+let gramas = 0;
+let gramasPorSegundo = 0;
 
-function preload() {
-  // Você pode usar um bloco real de grama se tiver a imagem
-  grassImage = loadImage("https://static.wikia.nocookie.net/minecraft_gamepedia/images/0/02/Grass_Block_JE4_BE4.png");
+const counter = document.getElementById("counter");
+const grassBlock = document.getElementById("grassBlock");
+const upgradesDiv = document.getElementById("upgrades");
+
+// Clique principal
+grassBlock.addEventListener("click", () => {
+  gramas++;
+  updateCounter();
+});
+
+// Atualiza o contador
+function updateCounter() {
+  counter.textContent = `Gramas: ${gramas}`;
 }
 
-function setup() {
-  createCanvas(windowWidth, windowHeight);
-  imageMode(CENTER);
-}
+// Upgrades
+const upgrades = [
+  { nome: "Pá automática", custo: 10, valor: 1 },
+  { nome: "Aldeão Mineiro", custo: 50, valor: 5 },
+  { nome: "Cortador de Grama", custo: 200, valor: 20 }
+];
 
-function draw() {
-  background('#d0f0c0');
-  
-  // Desenha o bloco de grama no centro da tela
-  let size = min(width, height) * 0.5;
-  image(grassImage, width / 2, height / 2, size, size);
-}
+upgrades.forEach((upgrade) => {
+  const btn = document.createElement("button");
+  btn.textContent = `${upgrade.nome} (${upgrade.custo})`;
+  btn.onclick = () => {
+    if (gramas >= upgrade.custo) {
+      gramas -= upgrade.custo;
+      gramasPorSegundo += upgrade.valor;
+      upgrade.custo = Math.floor(upgrade.custo * 1.5);
+      btn.textContent = `${upgrade.nome} (${upgrade.custo})`;
+      updateCounter();
+    }
+  };
+  upgradesDiv.appendChild(btn);
+});
 
-function mousePressed() {
-  let size = min(width, height) * 0.5;
-  let d = dist(mouseX, mouseY, width / 2, height / 2);
-  
-  if (d < size / 2) {
-    counter++;
-    document.getElementById("counter").textContent = counter;
-    
-    // Efeito sonoro, partícula, ou vibração aqui (futuramente)
-  }
-}
+// Loop automático
+setInterval(() => {
+  gramas += gramasPorSegundo;
+  updateCounter();
+}, 1000);
+
