@@ -1,3 +1,4 @@
+// Código restaurado sem imagens
 const resources = {
   grama: { unlocked: true, count: 0, perSecond: 0, baseCost: 10, upgradeLevel: 0 },
   madeira: { unlocked: false, count: 0, perSecond: 0, baseCost: 100, upgradeLevel: 0 },
@@ -118,33 +119,12 @@ function renderResources() {
     if (res.unlocked) {
       const div = document.createElement('div');
       div.classList.add('resource');
-
-      const img = document.createElement('img');
-      img.src = `images/${key}.png`;
-      img.alt = key;
-      img.style.width = '64px';
-      img.style.height = '64px';
-
-      const text = document.createElement('div');
-      text.textContent = `${key}: ${res.count} (+${res.perSecond}/s)`;
-
-      const clickBtn = document.createElement('button');
-      clickBtn.textContent = `Coletar ${key}`;
-      clickBtn.onclick = () => earn(key);
-
-      const upgradeBtn = document.createElement('button');
-      upgradeBtn.textContent = `Upgrade (${Math.floor(res.baseCost * Math.pow(1.75, res.upgradeLevel))})`;
-      upgradeBtn.onclick = () => upgrade(key);
-
-      const exchangeBtn = document.createElement('button');
-      exchangeBtn.textContent = `Trocar 100 ${key} por 10 moedas`;
-      exchangeBtn.onclick = () => exchange(key);
-
-      div.appendChild(img);
-      div.appendChild(text);
-      div.appendChild(clickBtn);
-      div.appendChild(upgradeBtn);
-      div.appendChild(exchangeBtn);
+      div.innerHTML = `
+        <div>${key}: ${res.count} (+${res.perSecond}/s)</div>
+        <button onclick="earn('${key}')">Coletar ${key}</button>
+        <button onclick="upgrade('${key}')">Upgrade (${Math.floor(res.baseCost * Math.pow(1.75, res.upgradeLevel))})</button>
+        <button onclick="exchange('${key}')">Trocar 100 ${key} por 10 moedas</button>
+      `;
       container.appendChild(div);
     }
   }
