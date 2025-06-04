@@ -43,3 +43,21 @@ setInterval(() => {
   gramas += gramasPorSegundo;
   updateCounter();
 }, 1000);
+const achievements = [
+  { gramas: 10, texto: "Primeiras 10 gramas 🌿" },
+  { gramas: 100, texto: "100 gramas colhidas! 🌾" },
+  { gramas: 500, texto: "Você é um fazendeiro nato! 🧑‍🌾" }
+];
+
+const unlocked = [];
+
+function checkAchievements() {
+  achievements.forEach((a) => {
+    if (gramas >= a.gramas && !unlocked.includes(a.texto)) {
+      unlocked.push(a.texto);
+      const div = document.createElement("div");
+      div.textContent = `🏆 ${a.texto}`;
+      document.getElementById("achievements").appendChild(div);
+    }
+  });
+}
