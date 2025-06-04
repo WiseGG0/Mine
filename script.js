@@ -1,4 +1,159 @@
-  upgradeBtn.textContent = `Upgrade automático (+1/s) - Custa ${getUpgradeCost(resource).toFixed(0)} ${resource.name}`;
+const BASE_UPGRADE_COST = 50;
+const COST_MULTIPLIER = 1.15;
+const SAVE_KEY = "mineClickerSave";
+
+const resources = [
+  {
+    name: "Grama",
+    key: "grama",
+    image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/3/3c/Grass_Block_JE5_BE5.png",
+    unlocked: true,
+    amount: 0,
+    auto: 0,
+    clickPower: 1,
+    unlockCost: 0,
+    upgradeLevel: 0
+  },
+  {
+    name: "Madeira",
+    key: "madeira",
+    image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/5/5e/Oak_Log.png",
+    unlocked: false,
+    amount: 0,
+    auto: 0,
+    clickPower: 1,
+    unlockCost: 1000,
+    unlockDependency: "grama",
+    upgradeLevel: 0
+  },
+  {
+    name: "Pedra",
+    key: "pedra",
+    image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/8/89/Stone_JE3_BE3.png",
+    unlocked: false,
+    amount: 0,
+    auto: 0,
+    clickPower: 1,
+    unlockCost: 5000,
+    unlockDependency: "madeira",
+    upgradeLevel: 0
+  },
+  {
+    name: "Cobre",
+    key: "cobre",
+    image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/f/f0/Block_of_Raw_Copper_JE2_BE2.png",
+    unlocked: false,
+    amount: 0,
+    auto: 0,
+    clickPower: 1,
+    unlockCost: 10000,
+    unlockDependency: "pedra",
+    upgradeLevel: 0
+  },
+  {
+    name: "Ferro",
+    key: "ferro",
+    image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/b/b1/Block_of_Raw_Iron_JE2_BE2.png",
+    unlocked: false,
+    amount: 0,
+    auto: 0,
+    clickPower: 1,
+    unlockCost: 25000,
+    unlockDependency: "cobre",
+    upgradeLevel: 0
+  }
+];
+
+// Moedas para loja
+let coins = 0;
+// Prestígio - bônus multiplicador na coleta
+let prestigeCount = 0;
+let prestigeMultiplier = 1;
+
+const achievements = [
+  {
+    id: "firstClick",
+    name: "Primeiro Clique",
+    description: "Clique no bloco pela primeira vez",
+    achieved: false,
+    check: () => totalClicks >= 1
+  },
+  {
+    id: "grama100",
+    name: "100 Gramas",
+    description: "Colete 100 unidades de Grama",
+    achieved: false,
+    check: () => getResource("grama").amount >= 100
+  },
+  {
+    id: "madeira1000",
+    name: "1000 Madeiras",
+    description: "Colete 1000 unidades de Madeira",
+    achieved: false,
+    check: () => getResource("madeira").amount >= 1000
+  },
+  {
+    id: "pedra5000",
+    name: "5000 Pedras",
+    description: "Colete 5000 unidades de Pedra",
+    achieved: false,
+    check: () => getResource("pedra").amount >= 5000
+  },
+  {
+    id: "cobre10000",
+    name: "10000 Cobres",
+    description: "Colete 10000 unidades de Cobre",
+    achieved: false,
+    check: () => getResource("cobre").amount >= 10000
+  },
+  {
+    id: "ferro25000",
+    name: "25000 Ferros",
+    description: "Colete 25000 unidades de Ferro",
+    achieved: false,
+    check: () => getResource("ferro").amount >= 25000
+  },
+  {
+    id: "prestige1",
+    name: "Primeiro Prestígio",
+    description: "Realize seu primeiro prestígio",
+    achieved: false,
+    check: () => prestigeCount >= 1
+  }
+];
+
+let totalClicks = 0;
+
+function getResource(key) {
+  return resources.find(r => r.key === key);
+}
+
+function createResourceElement(resource) {
+  const div = document.createElement("div");
+  div.className = "resource";
+  div.id = resource.key;
+
+  const icon = document.createElement("div");
+  icon.className = "clickable";
+  icon.style.backgroundImage = `url(${resource.image})`;
+  icon.ontouchstart = icon.onclick = () => {
+    resource.amount += resource.clickPower * prestigeMultiplier;
+    totalClicks++;
+    updateAchievements();
+    update();
+  };
+  div.appendChild(icon);
+
+  const label = document.createElement("p");
+  label.innerHTML = `<strong>${resource.name}</strong>: ${Math.floor(resource.amount)}`;
+  div.appendChild(label);
+
+  const perSec = document.createElement("p");
+  perSec.textContent = `Produção: ${(resource.auto * prestigeMultiplier).toFixed(1)} / s`;
+  div.appendChild(perSec);
+
+  const upgradeBtn = document.createElement("button");
+   upgradeBtn.textContent = `Upgrade automático (+1/s) - Custa ${getUpgradeCost(resource).toFixed(0)} ${resource.name}`;
   upgradeBtn.onclick = () => {
     const cost = getUpgradeCost(resource);
     if (resource.amount >= cost) {
