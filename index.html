@@ -2,38 +2,9 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
   <title>Mine Clicker</title>
-  <style>
-    body {
-      font-family: sans-serif;
-      background-color: #e8f5e9;
-      text-align: center;
-    }
-    h1 {
-      color: #2e7d32;
-    }
-    .resource {
-      border: 1px solid #ccc;
-      margin: 10px;
-      padding: 10px;
-      display: inline-block;
-      background: white;
-      border-radius: 8px;
-    }
-    .resource img {
-      width: 100px;
-      cursor: pointer;
-    }
-    #shop, #achievements, #bonusShop {
-      margin: 20px;
-    }
-    button {
-      margin: 5px;
-      padding: 5px 10px;
-      cursor: pointer;
-    }
-  </style>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <h1>Mine Clicker</h1>
@@ -43,11 +14,7 @@
   <div id="shop">
     <h2>Loja</h2>
     <p>Moedas: <span id="coins">0</span></p>
-  </div>
-
-  <div id="bonusShop">
-    <h2>Loja de Bônus</h2>
-    <div id="bonus-items"></div>
+    <div id="shop-items"></div>
   </div>
 
   <div id="achievements">
