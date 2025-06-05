@@ -37,25 +37,80 @@ const baseResources = [
       { nome: "+1/s", nivel: 0, custo: 500 },
       { nome: "-1s geração", nivel: 0, custo: 1000 }
     ]
+  },
+  {
+    nome: "Pedra",
+    id: "pedra",
+    img: "stone.png",
+    quantidade: 0,
+    porClick: 1,
+    porSegundo: 0,
+    tempoAuto: 20,
+    tempoAtual: 0,
+    desbloqueado: false,
+    desbloqueioRequisito: 5000,
+    desbloqueioRecurso: "madeira",
+    valorVenda: 3,
+    upgrades: [
+      { nome: "+1 por click", nivel: 0, custo: 1000 },
+      { nome: "+1/s", nivel: 0, custo: 2500 },
+      { nome: "-1s geração", nivel: 0, custo: 5000 }
+    ]
+  },
+  {
+    nome: "Cobre",
+    id: "cobre",
+    img: "copper.png",
+    quantidade: 0,
+    porClick: 1,
+    porSegundo: 0,
+    tempoAuto: 20,
+    tempoAtual: 0,
+    desbloqueado: false,
+    desbloqueioRequisito: 10000,
+    desbloqueioRecurso: "pedra",
+    valorVenda: 4,
+    upgrades: [
+      { nome: "+1 por click", nivel: 0, custo: 5000 },
+      { nome: "+1/s", nivel: 0, custo: 10000 },
+      { nome: "-1s geração", nivel: 0, custo: 20000 }
+    ]
+  },
+  {
+    nome: "Ferro",
+    id: "ferro",
+    img: "iron.png",
+    quantidade: 0,
+    porClick: 1,
+    porSegundo: 0,
+    tempoAuto: 20,
+    tempoAtual: 0,
+    desbloqueado: false,
+    desbloqueioRequisito: 25000,
+    desbloqueioRecurso: "cobre",
+    valorVenda: 5,
+    upgrades: [
+      { nome: "+1 por click", nivel: 0, custo: 20000 },
+      { nome: "+1/s", nivel: 0, custo: 50000 },
+      { nome: "-1s geração", nivel: 0, custo: 100000 }
+    ]
   }
-  // Adicione outros recursos aqui
 ];
 
 let resources = JSON.parse(localStorage.getItem("mineClickerSave")) || baseResources;
-let moedas = parseInt(localStorage.getItem("moedas")) || 0;
-let geradorBonus = parseInt(localStorage.getItem("geradorBonus")) || 0;
+let moedas = Number(localStorage.getItem("moedas"));
+if (isNaN(moedas)) moedas = 0;
 
 function saveGame() {
   localStorage.setItem("mineClickerSave", JSON.stringify(resources));
   localStorage.setItem("moedas", moedas);
-  localStorage.setItem("geradorBonus", geradorBonus);
 }
 
 function renderResources() {
   const resourcesDiv = document.getElementById("resources");
   resourcesDiv.innerHTML = "";
 
-  resources.forEach((res) => {
+  resources.forEach((res, index) => {
     if (!res.desbloqueado) return;
 
     const container = document.createElement("div");
@@ -64,6 +119,8 @@ function renderResources() {
     const img = document.createElement("img");
     img.src = res.img;
     img.alt = res.nome;
+    img.style.width = "100px";
+    img.style.cursor = "pointer";
     img.onclick = () => {
       res.quantidade += res.porClick;
       checkUnlocks();
@@ -77,17 +134,20 @@ function renderResources() {
     const info = document.createElement("p");
     info.textContent = `+${res.porSegundo}/s, Tempo: ${res.tempoAuto}s`;
 
+    // Botão de venda
     const sellBtn = document.createElement("button");
-    sellBtn.textContent = `Vender 100 ${res.nome} por ${res.valorVenda} moeda(s)`;
+    const valor = res.valorVenda || 0;
+    sellBtn.textContent = `Vender 100 ${res.nome} por ${valor} moeda(s)`;
     sellBtn.onclick = () => {
       if (res.quantidade >= 100) {
         res.quantidade -= 100;
-        moedas += res.valorVenda;
+        moedas += valor;
         renderResources();
-        renderBonusShop();
+        renderShop();
       }
     };
 
+    // Upgrades
     const upgradeDiv = document.createElement("div");
     res.upgrades.forEach((upg, i) => {
       const btn = document.createElement("button");
@@ -117,23 +177,8 @@ function renderResources() {
   document.getElementById("coins").textContent = moedas;
 }
 
-function renderBonusShop() {
-  const bonusDiv = document.getElementById("bonus-items");
-  bonusDiv.innerHTML = "";
-
-  const btn = document.createElement("button");
-  btn.textContent = `Comprar Gerador Automático (10 moedas)`;
-  btn.disabled = moedas < 10;
-  btn.onclick = () => {
-    if (moedas >= 10) {
-      moedas -= 10;
-      geradorBonus++;
-      renderBonusShop();
-      renderResources();
-    }
-  };
-
-  bonusDiv.appendChild(btn);
+function renderShop() {
+  document.getElementById("coins").textContent = moedas;
 }
 
 function checkUnlocks() {
@@ -148,18 +193,16 @@ function checkUnlocks() {
 }
 
 function autoGenerate() {
-  for (let i = 0; i < 1 + geradorBonus; i++) {
-    resources.forEach(res => {
-      if (res.desbloqueado) {
-        res.tempoAtual++;
-        if (res.tempoAtual >= res.tempoAuto) {
-          res.quantidade += res.porSegundo;
-          res.tempoAtual = 0;
-          checkAchievements(res);
-        }
+  resources.forEach(res => {
+    if (res.desbloqueado) {
+      res.tempoAtual++;
+      if (res.tempoAtual >= res.tempoAuto) {
+        res.quantidade += res.porSegundo;
+        res.tempoAtual = 0;
+        checkAchievements(res);
       }
-    });
-  }
+    }
+  });
   checkUnlocks();
   renderResources();
 }
@@ -177,7 +220,8 @@ function checkAchievements(res) {
 
 document.getElementById("resetButton").onclick = () => {
   if (confirm("Deseja realmente resetar seu progresso?")) {
-    localStorage.clear();
+    localStorage.removeItem("mineClickerSave");
+    localStorage.removeItem("moedas");
     location.reload();
   }
 };
@@ -196,15 +240,12 @@ document.getElementById("prestigeButton").onclick = () => {
       });
     });
     moedas = 0;
-    geradorBonus = 0;
     saveGame();
     renderResources();
-    renderBonusShop();
   }
 };
 
 renderResources();
-renderBonusShop();
 setInterval(() => {
   autoGenerate();
   saveGame();
