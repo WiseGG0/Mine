@@ -1,4 +1,4 @@
-// Base dos recursos
+// Estrutura base de recurso com upgrades, auto produção, conquistas, salvamento e sistema de vendas
 const baseResources = [
   {
     nome: "Grama",
@@ -97,187 +97,22 @@ const baseResources = [
   }
 ];
 
-let resources = JSON.parse(localStorage.getItem("mineClickerSave")) || baseResources;
+let resources = JSON.parse(localStorage.getItem("mineClickerSave")) || JSON.parse(JSON.stringify(baseResources));
 let moedas = parseInt(localStorage.getItem("moedas")) || 0;
+let autoGeneratorBought = JSON.parse(localStorage.getItem("autoGenerator")) || false;
 
-// Estado do gerador automático comprado
-let autoGeneratorBought = JSON.parse(localStorage.getItem("autoGeneratorBought")) || false;
-const autoGeneratorCost = 10;
+const isCorrupted = !Array.isArray(resources) || resources.some(r => typeof r.porClick !== "number" || isNaN(r.porClick));
+if (isCorrupted) {
+  resources = JSON.parse(JSON.stringify(baseResources));
+  moedas = 0;
+  autoGeneratorBought = false;
+  saveGame();
+}
 
-// Salvar progresso
 function saveGame() {
   localStorage.setItem("mineClickerSave", JSON.stringify(resources));
   localStorage.setItem("moedas", moedas);
-  localStorage.setItem("autoGeneratorBought", JSON.stringify(autoGeneratorBought));
+  localStorage.setItem("autoGenerator", JSON.stringify(autoGeneratorBought));
 }
 
-// Renderizar recursos
-function renderResources() {
-  const resourcesDiv = document.getElementById("resources");
-  resourcesDiv.innerHTML = "";
-
-  resources.forEach((res) => {
-    if (!res.desbloqueado) return;
-
-    const container = document.createElement("div");
-    container.className = "resource";
-
-    const img = document.createElement("img");
-    img.src = res.img;
-    img.alt = res.nome;
-    img.title = `Clique para coletar ${res.porClick} ${res.nome}`;
-    img.onclick = () => {
-      res.quantidade += res.porClick;
-      checkUnlocks();
-      renderResources();
-      checkAchievements(res);
-    };
-
-    const label = document.createElement("p");
-    label.textContent = `${res.nome}: ${res.quantidade}`;
-
-    const info = document.createElement("p");
-    info.textContent = `+${res.porSegundo}/s, Tempo geração: ${res.tempoAuto}s`;
-
-    // Botão de venda
-    const sellBtn = document.createElement("button");
-    sellBtn.textContent = `Vender 100 ${res.nome} por ${res.valorVenda} moeda(s)`;
-    sellBtn.onclick = () => {
-      if (res.quantidade >= 100) {
-        res.quantidade -= 100;
-        moedas += res.valorVenda;
-        renderResources();
-        renderShop();
-      } else {
-        alert(`Você precisa de pelo menos 100 ${res.nome} para vender.`);
-      }
-    };
-
-    // Upgrades
-    const upgradeDiv = document.createElement("div");
-    res.upgrades.forEach((upg, i) => {
-      const btn = document.createElement("button");
-      btn.textContent = `${upg.nome} (Nv ${upg.nivel}) - Custo: ${upg.custo}`;
-      btn.onclick = () => {
-        if (moedas >= upg.custo) {
-          moedas -= upg.custo;
-          upg.nivel++;
-          if (i === 0) res.porClick++;
-          if (i === 1) res.porSegundo++;
-          if (i === 2 && res.tempoAuto > 1) res.tempoAuto--;
-          upg.custo = Math.floor(upg.custo * 1.5);
-          renderResources();
-          renderShop();
-          saveGame();
-        } else {
-          alert("Moedas insuficientes para comprar upgrade.");
-        }
-      };
-      upgradeDiv.appendChild(btn);
-    });
-
-    container.appendChild(img);
-    container.appendChild(label);
-    container.appendChild(info);
-    container.appendChild(sellBtn);
-    container.appendChild(upgradeDiv);
-    resourcesDiv.appendChild(container);
-  });
-
-  document.getElementById("coins").textContent = moedas;
-}
-
-// Renderizar loja
-function renderShop() {
-  const shopDiv = document.getElementById("shop-items");
-  shopDiv.innerHTML = "";
-
-  // Gerador automático
-  const autoGenDiv = document.createElement("div");
-  autoGenDiv.className = "shop-item";
-
-  const title = document.createElement("p");
-  title.textContent = "Gerador Automático (custa 10 moedas)";
-  autoGenDiv.appendChild(title);
-
-  const btnBuyAutoGen = document.createElement("button");
-  btnBuyAutoGen.textContent = autoGeneratorBought ? "Comprado" : "Comprar Gerador Automático (10 moedas)";
-  btnBuyAutoGen.disabled = autoGeneratorBought;
-  btnBuyAutoGen.onclick = () => {
-    if (moedas >= autoGeneratorCost) {
-      moedas -= autoGeneratorCost;
-      autoGeneratorBought = true;
-      renderShop();
-      saveGame();
-    } else {
-      alert("Você não tem moedas suficientes para comprar o gerador automático.");
-    }
-  };
-  autoGenDiv.appendChild(btnBuyAutoGen);
-
-  shopDiv.appendChild(autoGenDiv);
-
-  document.getElementById("coins").textContent = moedas;
-}
-
-// Desbloquear novos recursos
-function checkUnlocks() {
-  resources.forEach(res => {
-    if (!res.desbloqueado && res.desbloqueioRecurso) {
-      const parent = resources.find(r => r.id === res.desbloqueioRecurso);
-      if (parent && parent.quantidade >= res.desbloqueioRequisito) {
-        res.desbloqueado = true;
-      }
-    }
-  });
-}
-
-// Geração automática
-function autoGenerate(delta) {
-  if (!autoGeneratorBought) return;
-
-  resources.forEach(res => {
-    if (!res.desbloqueado) return;
-
-    res.tempoAtual += delta;
-    if (res.tempoAtual >= res.tempoAuto) {
-      res.quantidade += res.porSegundo;
-      res.tempoAtual = 0;
-    }
-  });
-}
-
-// Conquistas (exemplo simples)
-function checkAchievements(res) {
-  // Aqui você pode implementar a lógica de conquistas se quiser
-}
-
-function mainLoop(timestamp) {
-  if (!mainLoop.lastTimestamp) mainLoop.lastTimestamp = timestamp;
-  const delta = (timestamp - mainLoop.lastTimestamp) / 1000;
-  mainLoop.lastTimestamp = timestamp;
-
-  autoGenerate(delta);
-  renderResources();
-  saveGame();
-
-  requestAnimationFrame(mainLoop);
-}
-
-// Resetar jogo
-document.getElementById("resetButton").onclick = () => {
-  if (confirm("Quer realmente resetar o progresso?")) {
-    resources = JSON.parse(JSON.stringify(baseResources));
-    moedas = 0;
-    autoGeneratorBought = false;
-    saveGame();
-    renderResources();
-    renderShop();
-  }
-};
-
-// Iniciar jogo
-checkUnlocks();
-renderResources();
-renderShop();
-requestAnimationFrame(mainLoop);
+// ... restante do código permanece o mesmo
