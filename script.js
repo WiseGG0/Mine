@@ -1,4 +1,4 @@
-// Estrutura base com recursos, upgrades e vendas
+// Estrutura base de recurso com upgrades, auto produção, conquistas, salvamento e sistema de vendas
 const baseResources = [
   {
     nome: "Grama",
@@ -37,72 +37,18 @@ const baseResources = [
       { nome: "+1/s", nivel: 0, custo: 500 },
       { nome: "-1s geração", nivel: 0, custo: 1000 }
     ]
-  },
-  {
-    nome: "Pedra",
-    id: "pedra",
-    img: "stone.png",
-    quantidade: 0,
-    porClick: 1,
-    porSegundo: 0,
-    tempoAuto: 20,
-    tempoAtual: 0,
-    desbloqueado: false,
-    desbloqueioRequisito: 5000,
-    desbloqueioRecurso: "madeira",
-    valorVenda: 3,
-    upgrades: [
-      { nome: "+1 por click", nivel: 0, custo: 1000 },
-      { nome: "+1/s", nivel: 0, custo: 2500 },
-      { nome: "-1s geração", nivel: 0, custo: 5000 }
-    ]
-  },
-  {
-    nome: "Cobre",
-    id: "cobre",
-    img: "copper.png",
-    quantidade: 0,
-    porClick: 1,
-    porSegundo: 0,
-    tempoAuto: 20,
-    tempoAtual: 0,
-    desbloqueado: false,
-    desbloqueioRequisito: 10000,
-    desbloqueioRecurso: "pedra",
-    valorVenda: 4,
-    upgrades: [
-      { nome: "+1 por click", nivel: 0, custo: 5000 },
-      { nome: "+1/s", nivel: 0, custo: 10000 },
-      { nome: "-1s geração", nivel: 0, custo: 20000 }
-    ]
-  },
-  {
-    nome: "Ferro",
-    id: "ferro",
-    img: "iron.png",
-    quantidade: 0,
-    porClick: 1,
-    porSegundo: 0,
-    tempoAuto: 20,
-    tempoAtual: 0,
-    desbloqueado: false,
-    desbloqueioRequisito: 25000,
-    desbloqueioRecurso: "cobre",
-    valorVenda: 5,
-    upgrades: [
-      { nome: "+1 por click", nivel: 0, custo: 20000 },
-      { nome: "+1/s", nivel: 0, custo: 50000 },
-      { nome: "-1s geração", nivel: 0, custo: 100000 }
-    ]
   }
+  // Adicione outros recursos aqui
 ];
 
 let resources = JSON.parse(localStorage.getItem("mineClickerSave")) || baseResources;
 let moedas = parseInt(localStorage.getItem("moedas")) || 0;
+let geradorBonus = parseInt(localStorage.getItem("geradorBonus")) || 0;
 
 function saveGame() {
   localStorage.setItem("mineClickerSave", JSON.stringify(resources));
   localStorage.setItem("moedas", moedas);
+  localStorage.setItem("geradorBonus", geradorBonus);
 }
 
 function renderResources() {
@@ -129,7 +75,7 @@ function renderResources() {
     label.textContent = `${res.nome}: ${res.quantidade}`;
 
     const info = document.createElement("p");
-    info.textContent = `+${res.porSegundo}/s | Tempo: ${res.tempoAuto}s`;
+    info.textContent = `+${res.porSegundo}/s, Tempo: ${res.tempoAuto}s`;
 
     const sellBtn = document.createElement("button");
     sellBtn.textContent = `Vender 100 ${res.nome} por ${res.valorVenda} moeda(s)`;
@@ -138,7 +84,7 @@ function renderResources() {
         res.quantidade -= 100;
         moedas += res.valorVenda;
         renderResources();
-        renderShop();
+        renderBonusShop();
       }
     };
 
@@ -171,8 +117,23 @@ function renderResources() {
   document.getElementById("coins").textContent = moedas;
 }
 
-function renderShop() {
-  document.getElementById("coins").textContent = moedas;
+function renderBonusShop() {
+  const bonusDiv = document.getElementById("bonus-items");
+  bonusDiv.innerHTML = "";
+
+  const btn = document.createElement("button");
+  btn.textContent = `Comprar Gerador Automático (10 moedas)`;
+  btn.disabled = moedas < 10;
+  btn.onclick = () => {
+    if (moedas >= 10) {
+      moedas -= 10;
+      geradorBonus++;
+      renderBonusShop();
+      renderResources();
+    }
+  };
+
+  bonusDiv.appendChild(btn);
 }
 
 function checkUnlocks() {
@@ -187,16 +148,18 @@ function checkUnlocks() {
 }
 
 function autoGenerate() {
-  resources.forEach(res => {
-    if (res.desbloqueado) {
-      res.tempoAtual++;
-      if (res.tempoAtual >= res.tempoAuto) {
-        res.quantidade += res.porSegundo;
-        res.tempoAtual = 0;
-        checkAchievements(res);
+  for (let i = 0; i < 1 + geradorBonus; i++) {
+    resources.forEach(res => {
+      if (res.desbloqueado) {
+        res.tempoAtual++;
+        if (res.tempoAtual >= res.tempoAuto) {
+          res.quantidade += res.porSegundo;
+          res.tempoAtual = 0;
+          checkAchievements(res);
+        }
       }
-    }
-  });
+    });
+  }
   checkUnlocks();
   renderResources();
 }
@@ -214,8 +177,7 @@ function checkAchievements(res) {
 
 document.getElementById("resetButton").onclick = () => {
   if (confirm("Deseja realmente resetar seu progresso?")) {
-    localStorage.removeItem("mineClickerSave");
-    localStorage.removeItem("moedas");
+    localStorage.clear();
     location.reload();
   }
 };
@@ -234,12 +196,15 @@ document.getElementById("prestigeButton").onclick = () => {
       });
     });
     moedas = 0;
+    geradorBonus = 0;
     saveGame();
     renderResources();
+    renderBonusShop();
   }
 };
 
 renderResources();
+renderBonusShop();
 setInterval(() => {
   autoGenerate();
   saveGame();
