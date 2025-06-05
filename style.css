@@ -1,32 +1,45 @@
 body {
   font-family: Arial, sans-serif;
-  padding: 10px;
-  max-width: 700px;
-  margin: auto;
+  background-color: #111;
+  color: #eee;
+  text-align: center;
 }
 
-.resource, #shop-items > div {
-  border: 1px solid #aaa;
-  padding: 10px;
-  margin: 10px 0;
+#resources {
   display: flex;
-  align-items: center;
-  gap: 15px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.resource {
+  border: 1px solid #555;
+  border-radius: 8px;
+  margin: 10px;
+  padding: 15px;
+  background-color: #222;
+  width: 220px;
 }
 
 .resource img {
-  width: 80px;
-  height: 80px;
+  width: 100px;
   cursor: pointer;
 }
 
 button {
-  margin-top: 5px;
+  margin: 5px;
+  padding: 5px 10px;
+  background-color: #444;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
   cursor: pointer;
 }
 
-#achievement-list {
-  max-height: 150px;
-  overflow-y: auto;
-  padding-left: 20px;
+button:hover {
+  background-color: #666;
+}
+
+#moeda-loja {
+  margin-top: 20px;
 }
