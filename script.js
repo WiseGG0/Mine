@@ -2,7 +2,7 @@ const baseResources = [
   {
     nome: "Grama",
     id: "grama",
-    img: "assets/grass_block.png",
+    img: "grass_block.png",
     quantidade: 0,
     porClick: 1,
     porSegundo: 0,
@@ -20,7 +20,7 @@ const baseResources = [
   {
     nome: "Madeira",
     id: "madeira",
-    img: "assets/log.png",
+    img: "log.png",
     quantidade: 0,
     porClick: 1,
     porSegundo: 0,
@@ -38,7 +38,7 @@ const baseResources = [
   {
     nome: "Pedra",
     id: "pedra",
-    img: "assets/stone.png",
+    img: "stone.png",
     quantidade: 0,
     porClick: 1,
     porSegundo: 0,
@@ -56,7 +56,7 @@ const baseResources = [
   {
     nome: "Cobre",
     id: "cobre",
-    img: "assets/copper.png",
+    img: "copper.png",
     quantidade: 0,
     porClick: 1,
     porSegundo: 0,
@@ -74,7 +74,7 @@ const baseResources = [
   {
     nome: "Ferro",
     id: "ferro",
-    img: "assets/iron.png",
+    img: "iron.png",
     quantidade: 0,
     porClick: 1,
     porSegundo: 0,
