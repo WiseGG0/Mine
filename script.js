@@ -1,10 +1,10 @@
-let moedas = 0;
+let moedas = 1000000;
 let rebirths = 0;
 
 const baseResources = [
   {
     nome: "Grama", id: "grama", img: "grass_block.png",
-    quantidade: 0, porClick: 1, desbloqueado: true,
+    quantidade: 100, porClick: 100, desbloqueado: true,
     desbloqueioRequisito: 0, desbloqueioRecurso: null,
     valorVenda: 1,
     gerador: {
@@ -128,7 +128,7 @@ function upgradeGerador(i, tipo) {
 }
 
 function fazerRebirth() {
-  if (moedas >= 10000) {
+  if (moedas >= 10) {
     rebirths++;
     moedas = 0;
     baseResources.forEach(r => {
