@@ -1,19 +1,17 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Mine Clicker</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <h1>Mine Clicker</h1>
-  <div id="moedasDisplay">Moedas: 0</div>
-  <div id="rebirthDisplay">Rebirths: 0</div>
-  <div id="resourcesContainer"></div>
-
-  <button id="btnVenderTudo">Vender Tudo (x100)</button>
-  <button id="btnRebirth">Rebirth (Custa 1000 moedas)</button>
+  <div id="moedas">Moedas: 0</div>
+  <button onclick="venderTodos()">Vender Todos</button>
+  <button onclick="fazerRebirth()">Rebirth</button>
+  <div id="materiais"></div>
 
   <script src="script.js"></script>
 </body>
