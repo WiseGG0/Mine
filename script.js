@@ -75,8 +75,8 @@ function clicar(i) {
 }
 
 function vender(i) {
-  if (baseResources[i].quantidade >= 1) {
-    baseResources[i].quantidade -= 100;
+  if (baseResources[i].quantidade >= 100) {
+    baseResources[i].quantidade -= 1;
     moedas += 100 * baseResources[i].valorVenda;
     render();
   }
