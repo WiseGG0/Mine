@@ -7,7 +7,7 @@ const baseResources = [
   { nome: "Ferro", id: "ferro", img: "iron.png", quantidade: 0, porClick: 1, desbloqueado: false, desbloqueioRequisito: 200, desbloqueioRecurso: "cobre", valorVenda: 5, gerador: { nivel: 0, ativo: false, custo: 200, upgrades: { quantidade: { nivel: 0, custo: 400 }, tempo: { nivel: 0, custo: 600 } } }, upgradeClick: { nivel: 0, custo: 400 } }
 ];
 
-let moedas = 0;
+let moedas = 1000;
 
 const materiaisDiv = document.getElementById("materiais");
 const moedasDiv = document.getElementById("moedas");
@@ -57,12 +57,12 @@ function clicar(i) {
 // Vender 100 unidades do material
 function vender(i) {
   const r = baseResources[i];
-  if (r.quantidade >= 100) {
-    r.quantidade -= 100;
+  if (r.quantidade >= 1) {
+    r.quantidade -= 1;
     moedas += r.valorVenda;
     atualizarInterface();
   } else {
-    alert(`Você não tem 100 unidades de ${r.nome} para vender.`);
+    alert(`Você não tem 1 unidades de ${r.nome} para vender.`);
   }
 }
 
