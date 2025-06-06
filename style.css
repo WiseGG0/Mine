@@ -1,32 +1,24 @@
 body {
   font-family: Arial, sans-serif;
   padding: 20px;
-  background: #eef2f3;
-}
-
-#moedas {
-  font-size: 20px;
-  margin-bottom: 20px;
+  background: #f0f0f0;
 }
 
 .material {
+  background: white;
   border: 1px solid #ccc;
-  background: #fff;
   padding: 10px;
-  margin-bottom: 15px;
-  max-width: 300px;
+  margin-bottom: 10px;
+  width: 250px;
 }
 
 .material img {
-  width: 80px;
-  height: 80px;
+  width: 100px;
   cursor: pointer;
-  display: block;
-  margin-bottom: 10px;
 }
 
-.material button {
-  margin: 5px 3px 5px 0;
-  padding: 5px 10px;
+button {
+  margin: 4px 2px;
+  padding: 6px 10px;
   cursor: pointer;
 }
