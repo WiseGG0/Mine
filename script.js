@@ -8,16 +8,22 @@ const baseResources = [
 ];
 
 let moedas = 1000;
+let rebirths = 0; // Contador de rebirths
 
 const materiaisDiv = document.getElementById("materiais");
 const moedasDiv = document.getElementById("moedas");
 
+// Função para calcular multiplicador de produção (por rebirths)
+function multiplicador() {
+  return 1 + rebirths * 0.10; // +10% por rebirth
+}
+
 function atualizarInterface() {
-  moedasDiv.textContent = `Moedas: ${moedas}`;
+  moedasDiv.textContent = `Moedas: ${moedas} | Rebirths: ${rebirths}`;
+
   materiaisDiv.innerHTML = "";
 
   baseResources.forEach((r, i) => {
-    // Desbloquear recursos baseados em moedas
     if (!r.desbloqueado && r.desbloqueioRecurso) {
       const req = baseResources.find(x => x.id === r.desbloqueioRecurso);
       if (req && req.quantidade >= r.desbloqueioRequisito) {
@@ -33,7 +39,7 @@ function atualizarInterface() {
         <h3>${r.nome}</h3>
         <img src="${r.img}" alt="${r.nome}" onclick="clicar(${i})" />
         <p>Qtd: ${r.quantidade}</p>
-        <p>+${r.porClick}/click</p>
+        <p>+${(r.porClick * multiplicador()).toFixed(2)}/click</p>
         <button onclick="vender(${i})">Vender 100 por ${r.valorVenda} moedas</button><br/>
         <button onclick="upgradeClick(${i})">Up Click (${r.upgradeClick.custo} moedas)</button><br/>
         <h4>Gerador</h4>
@@ -45,16 +51,28 @@ function atualizarInterface() {
       materiaisDiv.appendChild(div);
     }
   });
+
+  // Botão de rebirth
+  let btnRebirth = document.getElementById("btnRebirth");
+  if (!btnRebirth) {
+    btnRebirth = document.createElement("button");
+    btnRebirth.id = "btnRebirth";
+    btnRebirth.style.marginTop = "20px";
+    btnRebirth.textContent = "Rebirth (Resetar para +10% produção) - custa 1000 moedas";
+    btnRebirth.onclick = rebirth;
+    document.body.appendChild(btnRebirth);
+  }
+  btnRebirth.disabled = moedas < 1000;
 }
 
-// Função para clicar no material e aumentar a quantidade
+// Clicar no recurso
 function clicar(i) {
   const r = baseResources[i];
-  r.quantidade += r.porClick;
+  r.quantidade += r.porClick * multiplicador();
   atualizarInterface();
 }
 
-// Vender 100 unidades do material
+// Vender 100 unidades
 function vender(i) {
   const r = baseResources[i];
   if (r.quantidade >= 1) {
@@ -62,11 +80,11 @@ function vender(i) {
     moedas += r.valorVenda;
     atualizarInterface();
   } else {
-    alert(`Você não tem 1 unidades de ${r.nome} para vender.`);
+    alert(`Você não tem 100 unidades de ${r.nome} para vender.`);
   }
 }
 
-// Comprar ou ativar gerador
+// Comprar ativar gerador
 function comprarGerador(i) {
   const r = baseResources[i];
   if (!r.gerador.ativo) {
@@ -83,7 +101,7 @@ function comprarGerador(i) {
   }
 }
 
-// Melhorar o clique
+// Upgrade de clique
 function upgradeClick(i) {
   const r = baseResources[i];
   if (moedas >= r.upgradeClick.custo) {
@@ -97,7 +115,7 @@ function upgradeClick(i) {
   }
 }
 
-// Melhorar gerador (quantidade ou tempo) - só atualiza custo e nível por enquanto
+// Upgrade gerador (quantidade ou tempo)
 function upgradeGerador(i, tipo) {
   const r = baseResources[i];
   const upgrade = r.gerador.upgrades[tipo];
@@ -106,25 +124,48 @@ function upgradeGerador(i, tipo) {
     moedas -= upgrade.custo;
     upgrade.nivel++;
     upgrade.custo = Math.floor(upgrade.custo * 1.7);
-
-    // Implementar efeito do upgrade: por simplicidade, só altera custo
-    // Pode adicionar lógica para aumentar produção ou reduzir tempo
-
     atualizarInterface();
   } else {
     alert(`Moedas insuficientes para upgrade de ${tipo}.`);
   }
 }
 
-// Atualização periódica para geradores (simples exemplo)
+// Função rebirth
+function rebirth() {
+  if (moedas < 1000) {
+    alert("Você precisa de pelo menos 1000 moedas para fazer rebirth.");
+    return;
+  }
+  if (confirm("Tem certeza que deseja reiniciar seu progresso para ganhar +10% de produção permanente?")) {
+    moedas = 0;
+    rebirths++;
+    // Resetar todos os recursos
+    baseResources.forEach(r => {
+      r.quantidade = 0;
+      r.porClick = 1 + r.upgradeClick.nivel; // reset base + upgrades de clique
+      r.gerador.ativo = false;
+      r.gerador.nivel = 0;
+      r.gerador.upgrades.quantidade.nivel = 0;
+      r.gerador.upgrades.quantidade.custo = (r.id === "grama") ? 10 : r.gerador.upgrades.quantidade.custo;
+      r.gerador.upgrades.tempo.nivel = 0;
+      r.gerador.upgrades.tempo.custo = (r.id === "grama") ? 15 : r.gerador.upgrades.tempo.custo;
+      r.upgradeClick.custo = (r.id === "grama") ? 10 : r.upgradeClick.custo;
+      r.desbloqueado = r.id === "grama" ? true : false; // só grama desbloqueado
+    });
+    atualizarInterface();
+  }
+}
+
+// Atualização periódica dos geradores (cada 3s)
 setInterval(() => {
   baseResources.forEach(r => {
     if (r.gerador.ativo) {
-      r.quantidade += 1 * (r.gerador.upgrades.quantidade.nivel + 1);
+      // Produção por segundo (3s aqui) com multiplicador e upgrade de quantidade
+      const producao = (1 + r.gerador.upgrades.quantidade.nivel) * multiplicador();
+      r.quantidade += producao;
     }
   });
   atualizarInterface();
 }, 3000);
 
 atualizarInterface();
-
