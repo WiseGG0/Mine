@@ -1,4 +1,4 @@
-let moedas = 1000000;
+let moedas = 0;
 let rebirths = 0;
 
 const baseResources = [
@@ -9,7 +9,7 @@ const baseResources = [
     valorVenda: 1,
     gerador: {
       nivel: 0, ativo: false, porSegundo: 0,
-      tempo: 2, tempoAtual: 0,
+      tempo: 20, tempoAtual: 0,
       upgrades: { quantidade: { nivel: 0, custo: 10 }, tempo: { nivel: 0, custo: 15 } },
       custo: 10
     },
@@ -76,7 +76,7 @@ function clicar(i) {
 
 function vender(i) {
   if (baseResources[i].quantidade >= 100) {
-    baseResources[i].quantidade -= 1;
+    baseResources[i].quantidade -= 100;
     moedas += 100 * baseResources[i].valorVenda;
     render();
   }
@@ -128,7 +128,7 @@ function upgradeGerador(i, tipo) {
 }
 
 function fazerRebirth() {
-  if (moedas >= 10) {
+  if (moedas >= 10000) {
     rebirths++;
     moedas = 0;
     baseResources.forEach(r => {
@@ -146,7 +146,7 @@ function fazerRebirth() {
     alert(`Rebirth realizado! Bônus aplicado: +${rebirths} por clique.`);
     render();
   } else {
-    alert("Você precisa de 10 moedas para fazer Rebirth.");
+    alert("Você precisa de 10.000 moedas para fazer Rebirth.");
   }
 }
 
