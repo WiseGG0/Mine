@@ -4,7 +4,7 @@ let rebirths = 0;
 const baseResources = [
   {
     nome: "Grama", id: "grama", img: "grass_block.png",
-    quantidade: 100, porClick: 100, desbloqueado: true,
+    quantidade: 0, porClick: 1, desbloqueado: true,
     desbloqueioRequisito: 0, desbloqueioRecurso: null,
     valorVenda: 1,
     gerador: {
