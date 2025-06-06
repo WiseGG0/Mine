@@ -1,246 +1,189 @@
-const baseResources = [
+const recursos = [
   {
-    nome: "Grama",
-    id: "grama",
-    img: "grass_block.png",
-    quantidade: 0,
-    porClick: 1,
-    desbloqueado: true,
-    desbloqueioRequisito: 0,
-    desbloqueioCustoMoeda: 0,
-    valorVenda: 1,
-    upgrades: [{ nome: "+1 por click", nivel: 0, custo: 10 }],
+    nome: "Grama", id: "grama", img: "grass_block.png",
+    quantidade: 0, porClick: 1, desbloqueado: true,
+    valorVenda: 1, custoDesbloqueio: 0,
+    upgradeClick: { nivel: 0, custo: 10 },
     gerador: {
-      comprado: false,
-      porSegundo: 0,
-      tempoAuto: 20,
-      tempoAtual: 0,
-      upgrades: [
-        { nome: "+1/s", nivel: 0, custo: 10 },
-        { nome: "-1s geração", nivel: 0, custo: 20 }
-      ]
+      ativo: false, nivel: 0, tempo: 5000, tempoAtual: 0,
+      upgrades: {
+        quantidade: { nivel: 0, custo: 10 },
+        tempo: { nivel: 0, custo: 15 }
+      },
+      custo: 10
     }
   },
   {
-    nome: "Madeira",
-    id: "madeira",
-    img: "log.png",
-    quantidade: 0,
-    porClick: 1,
-    desbloqueado: false,
-    desbloqueioRequisito: 0,
-    desbloqueioCustoMoeda: 10,
-    valorVenda: 2,
-    upgrades: [{ nome: "+1 por click", nivel: 0, custo: 100 }],
+    nome: "Madeira", id: "madeira", img: "log.png",
+    quantidade: 0, porClick: 1, desbloqueado: false,
+    valorVenda: 2, custoDesbloqueio: 10,
+    upgradeClick: { nivel: 0, custo: 50 },
     gerador: {
-      comprado: false,
-      porSegundo: 0,
-      tempoAuto: 20,
-      tempoAtual: 0,
-      upgrades: [
-        { nome: "+1/s", nivel: 0, custo: 50 },
-        { nome: "-1s geração", nivel: 0, custo: 100 }
-      ]
+      ativo: false, nivel: 0, tempo: 5000, tempoAtual: 0,
+      upgrades: {
+        quantidade: { nivel: 0, custo: 50 },
+        tempo: { nivel: 0, custo: 75 }
+      },
+      custo: 20
     }
   },
   {
-    nome: "Pedra",
-    id: "pedra",
-    img: "stone.png",
-    quantidade: 0,
-    porClick: 1,
-    desbloqueado: false,
-    desbloqueioRequisito: 0,
-    desbloqueioCustoMoeda: 100,
-    valorVenda: 3,
-    upgrades: [{ nome: "+1 por click", nivel: 0, custo: 500 }],
+    nome: "Pedra", id: "pedra", img: "stone.png",
+    quantidade: 0, porClick: 1, desbloqueado: false,
+    valorVenda: 3, custoDesbloqueio: 100,
+    upgradeClick: { nivel: 0, custo: 100 },
     gerador: {
-      comprado: false,
-      porSegundo: 0,
-      tempoAuto: 20,
-      tempoAtual: 0,
-      upgrades: [
-        { nome: "+1/s", nivel: 0, custo: 200 },
-        { nome: "-1s geração", nivel: 0, custo: 500 }
-      ]
+      ativo: false, nivel: 0, tempo: 5000, tempoAtual: 0,
+      upgrades: {
+        quantidade: { nivel: 0, custo: 100 },
+        tempo: { nivel: 0, custo: 150 }
+      },
+      custo: 50
+    }
+  },
+  {
+    nome: "Cobre", id: "cobre", img: "copper.png",
+    quantidade: 0, porClick: 1, desbloqueado: false,
+    valorVenda: 4, custoDesbloqueio: 200,
+    upgradeClick: { nivel: 0, custo: 200 },
+    gerador: {
+      ativo: false, nivel: 0, tempo: 5000, tempoAtual: 0,
+      upgrades: {
+        quantidade: { nivel: 0, custo: 200 },
+        tempo: { nivel: 0, custo: 300 }
+      },
+      custo: 100
+    }
+  },
+  {
+    nome: "Ferro", id: "ferro", img: "iron.png",
+    quantidade: 0, porClick: 1, desbloqueado: false,
+    valorVenda: 5, custoDesbloqueio: 400,
+    upgradeClick: { nivel: 0, custo: 400 },
+    gerador: {
+      ativo: false, nivel: 0, tempo: 5000, tempoAtual: 0,
+      upgrades: {
+        quantidade: { nivel: 0, custo: 400 },
+        tempo: { nivel: 0, custo: 600 }
+      },
+      custo: 200
     }
   }
 ];
 
-let resources = JSON.parse(localStorage.getItem("mineClickerSave")) || baseResources;
-let moedas = parseInt(localStorage.getItem("moedas")) || 0;
+let moedas = 0;
 
-function saveGame() {
-  localStorage.setItem("mineClickerSave", JSON.stringify(resources));
-  localStorage.setItem("moedas", moedas);
-}
+function renderRecursos() {
+  const container = document.getElementById("recursos");
+  container.innerHTML = "";
+  recursos.forEach((r, i) => {
+    if (!r.desbloqueado) return;
 
-function renderResources() {
-  const resourcesDiv = document.getElementById("resources");
-  resourcesDiv.innerHTML = "";
-
-  resources.forEach(res => {
-    if (!res.desbloqueado) return;
-
-    const container = document.createElement("div");
-    container.className = "resource";
-
-    const img = document.createElement("img");
-    img.src = res.img;
-    img.alt = res.nome;
-    img.onclick = () => {
-      res.quantidade += res.porClick;
-      renderResources();
-      checkAchievements(res);
-    };
-
-    const label = document.createElement("p");
-    label.textContent = `${res.nome}: ${res.quantidade}`;
-
-    const sellBtn = document.createElement("button");
-    sellBtn.textContent = `Vender 100 ${res.nome} por ${res.valorVenda} moeda(s)`;
-    sellBtn.onclick = () => {
-      if (res.quantidade >= 100) {
-        res.quantidade -= 100;
-        moedas += res.valorVenda;
-        renderResources();
-        renderShop();
-      }
-    };
-
-    // Upgrade de recurso
-    const upgradeBtn = document.createElement("button");
-    const upg = res.upgrades[0];
-    upgradeBtn.textContent = `${upg.nome} (Nv ${upg.nivel}) - Custo: ${upg.custo}`;
-    upgradeBtn.onclick = () => {
-      if (res.quantidade >= upg.custo) {
-        res.quantidade -= upg.custo;
-        upg.nivel++;
-        res.porClick++;
-        upg.custo = Math.floor(upg.custo * 1.5);
-        renderResources();
-      }
-    };
-
-    // Gerador
-    const geradorDiv = document.createElement("div");
-    geradorDiv.innerHTML = "<strong>Gerador Automático</strong><br>";
-
-    if (!res.gerador.comprado) {
-      const buyGerador = document.createElement("button");
-      buyGerador.textContent = `Comprar Gerador - 10 moedas`;
-      buyGerador.onclick = () => {
-        if (moedas >= 10) {
-          moedas -= 10;
-          res.gerador.comprado = true;
-          renderResources();
-        }
-      };
-      geradorDiv.appendChild(buyGerador);
-    } else {
-      res.gerador.upgrades.forEach((upg, i) => {
-        const btn = document.createElement("button");
-        btn.textContent = `${upg.nome} (Nv ${upg.nivel}) - ${upg.custo} moedas`;
-        btn.onclick = () => {
-          if (moedas >= upg.custo) {
-            moedas -= upg.custo;
-            upg.nivel++;
-            if (i === 0) res.gerador.porSegundo++;
-            if (i === 1 && res.gerador.tempoAuto > 1) res.gerador.tempoAuto--;
-            upg.custo = Math.floor(upg.custo * 2);
-            renderResources();
-          }
-        };
-        geradorDiv.appendChild(btn);
-      });
-    }
-
-    container.appendChild(img);
-    container.appendChild(label);
-    container.appendChild(sellBtn);
-    container.appendChild(upgradeBtn);
-    container.appendChild(geradorDiv);
-    resourcesDiv.appendChild(container);
+    const div = document.createElement("div");
+    div.className = "material";
+    div.innerHTML = `
+      <h3>${r.nome}</h3>
+      <img src="${r.img}" onclick="clicar(${i})"/>
+      <p>Qtd: ${r.quantidade}</p>
+      <p>+${r.porClick}/click</p>
+      <button onclick="vender(${i})">Vender 100 por ${r.valorVenda} moedas</button><br/>
+      <button onclick="upgradeClick(${i})">Up Click (${r.upgradeClick.custo})</button><br/>
+      <h4>Gerador</h4>
+      <button onclick="comprarGerador(${i})">${r.gerador.ativo ? "Ativado" : "Comprar"} (${r.gerador.custo})</button><br/>
+      <button onclick="upgradeGerador(${i}, 'quantidade')">+Qtd (${r.gerador.upgrades.quantidade.custo})</button>
+      <button onclick="upgradeGerador(${i}, 'tempo')">-Tempo (${r.gerador.upgrades.tempo.custo})</button>
+    `;
+    container.appendChild(div);
   });
-
-  document.getElementById("coins").textContent = moedas;
 }
 
-function renderShop() {
-  const loja = document.getElementById("moeda-loja");
+function renderLojaMoedas() {
+  const loja = document.getElementById("lojaMoedas");
   loja.innerHTML = "";
-
-  resources.forEach(res => {
-    if (res.desbloqueado || res.desbloqueioCustoMoeda === 0) return;
+  recursos.forEach((r, i) => {
+    if (r.desbloqueado) return;
     const btn = document.createElement("button");
-    btn.textContent = `Desbloquear ${res.nome} - ${res.desbloqueioCustoMoeda} moedas`;
+    btn.textContent = `Desbloquear ${r.nome} (${r.custoDesbloqueio} moedas)`;
     btn.onclick = () => {
-      if (moedas >= res.desbloqueioCustoMoeda) {
-        moedas -= res.desbloqueioCustoMoeda;
-        res.desbloqueado = true;
-        renderResources();
-        renderShop();
+      if (moedas >= r.custoDesbloqueio) {
+        moedas -= r.custoDesbloqueio;
+        r.desbloqueado = true;
+        renderTudo();
       }
     };
     loja.appendChild(btn);
   });
-
-  document.getElementById("coins").textContent = moedas;
 }
 
-function autoGenerate() {
-  resources.forEach(res => {
-    if (res.gerador.comprado) {
-      res.gerador.tempoAtual++;
-      if (res.gerador.tempoAtual >= res.gerador.tempoAuto) {
-        res.quantidade += res.gerador.porSegundo;
-        res.gerador.tempoAtual = 0;
-        checkAchievements(res);
+function clicar(i) {
+  recursos[i].quantidade += recursos[i].porClick;
+  renderTudo();
+}
+
+function vender(i) {
+  if (recursos[i].quantidade >= 100) {
+    recursos[i].quantidade -= 100;
+    moedas += recursos[i].valorVenda;
+    renderTudo();
+  }
+}
+
+function upgradeClick(i) {
+  const r = recursos[i];
+  if (r.quantidade >= r.upgradeClick.custo) {
+    r.quantidade -= r.upgradeClick.custo;
+    r.porClick++;
+    r.upgradeClick.nivel++;
+    r.upgradeClick.custo = Math.floor(r.upgradeClick.custo * 1.5);
+    renderTudo();
+  }
+}
+
+function comprarGerador(i) {
+  const r = recursos[i];
+  if (!r.gerador.ativo && moedas >= r.gerador.custo) {
+    moedas -= r.gerador.custo;
+    r.gerador.ativo = true;
+    r.gerador.nivel = 1;
+    r.gerador.porSegundo = 1;
+    renderTudo();
+  }
+}
+
+function upgradeGerador(i, tipo) {
+  const r = recursos[i];
+  const up = r.gerador.upgrades[tipo];
+  if (moedas >= up.custo) {
+    moedas -= up.custo;
+    up.nivel++;
+    if (tipo === "quantidade") {
+      r.gerador.porSegundo += 1;
+    } else {
+      r.gerador.tempo = Math.max(1000, r.gerador.tempo - 500);
+    }
+    up.custo = Math.floor(up.custo * 1.6);
+    renderTudo();
+  }
+}
+
+function gerarRecursos() {
+  recursos.forEach(r => {
+    if (r.gerador.ativo) {
+      r.gerador.tempoAtual += 1000;
+      if (r.gerador.tempoAtual >= r.gerador.tempo) {
+        r.gerador.tempoAtual = 0;
+        r.quantidade += r.gerador.porSegundo;
       }
     }
   });
-  renderResources();
+  renderTudo();
 }
 
-function checkAchievements(res) {
-  const list = document.getElementById("achievement-list");
-  const achieved = document.querySelector(`#achiev-${res.id}`);
-  if (!achieved && res.quantidade >= 100) {
-    const item = document.createElement("li");
-    item.id = `achiev-${res.id}`;
-    item.textContent = `Conquistou 100 ${res.nome}!`;
-    list.appendChild(item);
-  }
+function renderTudo() {
+  document.getElementById("moedas").textContent = `Moedas: ${moedas}`;
+  renderRecursos();
+  renderLojaMoedas();
 }
 
-document.getElementById("prestigeButton").onclick = () => {
-  if (confirm("Fazer Rebirth? Isso reiniciará seus recursos mas manterá suas moedas.")) {
-    resources.forEach(res => {
-      res.quantidade = 0;
-      res.porClick = 1;
-      res.desbloqueado = res.desbloqueioCustoMoeda === 0;
-      res.upgrades.forEach(u => {
-        u.nivel = 0;
-        u.custo = 10;
-      });
-      res.gerador.comprado = false;
-      res.gerador.porSegundo = 0;
-      res.gerador.tempoAuto = 20;
-      res.gerador.tempoAtual = 0;
-      res.gerador.upgrades.forEach(u => {
-        u.nivel = 0;
-        u.custo = u.nome.includes("+1/s") ? 10 : 20;
-      });
-    });
-    saveGame();
-    renderResources();
-    renderShop();
-  }
-};
-
-renderResources();
-renderShop();
-setInterval(() => {
-  autoGenerate();
-  saveGame();
-}, 1000);
+setInterval(gerarRecursos, 1000);
+renderTudo();
