@@ -1,4 +1,4 @@
-let moedas = 0;
+let moedas = 1000000;
 let rebirths = 0;
 
 const baseResources = [
