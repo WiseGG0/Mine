@@ -1,171 +1,288 @@
-// Recursos base
+let moedas = 0;
+let rebirthCount = 0;
+
 const baseResources = [
-  { nome: "Grama", id: "grama", img: "grass_block.png", quantidade: 0, porClick: 1, desbloqueado: true, desbloqueioRequisito: 0, desbloqueioRecurso: null, valorVenda: 1, gerador: { nivel: 0, ativo: false, custo: 10, upgrades: { quantidade: { nivel: 0, custo: 10 }, tempo: { nivel: 0, custo: 15 } } }, upgradeClick: { nivel: 0, custo: 10 } },
-  { nome: "Madeira", id: "madeira", img: "log.png", quantidade: 0, porClick: 1, desbloqueado: false, desbloqueioRequisito: 10, desbloqueioRecurso: "grama", valorVenda: 2, gerador: { nivel: 0, ativo: false, custo: 20, upgrades: { quantidade: { nivel: 0, custo: 50 }, tempo: { nivel: 0, custo: 75 } } }, upgradeClick: { nivel: 0, custo: 50 } },
-  { nome: "Pedra", id: "pedra", img: "stone.png", quantidade: 0, porClick: 1, desbloqueado: false, desbloqueioRequisito: 50, desbloqueioRecurso: "madeira", valorVenda: 3, gerador: { nivel: 0, ativo: false, custo: 50, upgrades: { quantidade: { nivel: 0, custo: 100 }, tempo: { nivel: 0, custo: 150 } } }, upgradeClick: { nivel: 0, custo: 100 } },
-  { nome: "Cobre", id: "cobre", img: "copper.png", quantidade: 0, porClick: 1, desbloqueado: false, desbloqueioRequisito: 100, desbloqueioRecurso: "pedra", valorVenda: 4, gerador: { nivel: 0, ativo: false, custo: 100, upgrades: { quantidade: { nivel: 0, custo: 200 }, tempo: { nivel: 0, custo: 300 } } }, upgradeClick: { nivel: 0, custo: 200 } },
-  { nome: "Ferro", id: "ferro", img: "iron.png", quantidade: 0, porClick: 1, desbloqueado: false, desbloqueioRequisito: 200, desbloqueioRecurso: "cobre", valorVenda: 5, gerador: { nivel: 0, ativo: false, custo: 200, upgrades: { quantidade: { nivel: 0, custo: 400 }, tempo: { nivel: 0, custo: 600 } } }, upgradeClick: { nivel: 0, custo: 400 } }
+  {
+    nome: "Grama",
+    id: "grama",
+    img: "grass_block.png",
+    quantidade: 0,
+    porClick: 1,
+    desbloqueado: true,
+    desbloqueioRequisito: 0,
+    desbloqueioRecurso: null,
+    valorVenda: 1,
+    gerador: {
+      nivel: 0,
+      ativo: false,
+      porSegundo: 0,
+      tempo: 20,
+      tempoAtual: 0,
+      upgrades: {
+        quantidade: { nivel: 0, custo: 10 },
+        tempo: { nivel: 0, custo: 15 },
+      },
+      custo: 10,
+    },
+    upgradeClick: { nivel: 0, custo: 10 },
+  },
+  {
+    nome: "Madeira",
+    id: "madeira",
+    img: "log.png",
+    quantidade: 0,
+    porClick: 1,
+    desbloqueado: false,
+    desbloqueioRequisito: 10,
+    desbloqueioRecurso: "grama",
+    valorVenda: 2,
+    gerador: {
+      nivel: 0,
+      ativo: false,
+      porSegundo: 0,
+      tempo: 20,
+      tempoAtual: 0,
+      upgrades: {
+        quantidade: { nivel: 0, custo: 50 },
+        tempo: { nivel: 0, custo: 75 },
+      },
+      custo: 20,
+    },
+    upgradeClick: { nivel: 0, custo: 50 },
+  },
+  {
+    nome: "Pedra",
+    id: "pedra",
+    img: "stone.png",
+    quantidade: 0,
+    porClick: 1,
+    desbloqueado: false,
+    desbloqueioRequisito: 50,
+    desbloqueioRecurso: "madeira",
+    valorVenda: 3,
+    gerador: {
+      nivel: 0,
+      ativo: false,
+      porSegundo: 0,
+      tempo: 20,
+      tempoAtual: 0,
+      upgrades: {
+        quantidade: { nivel: 0, custo: 100 },
+        tempo: { nivel: 0, custo: 150 },
+      },
+      custo: 50,
+    },
+    upgradeClick: { nivel: 0, custo: 100 },
+  },
+  {
+    nome: "Cobre",
+    id: "cobre",
+    img: "copper.png",
+    quantidade: 0,
+    porClick: 1,
+    desbloqueado: false,
+    desbloqueioRequisito: 100,
+    desbloqueioRecurso: "pedra",
+    valorVenda: 4,
+    gerador: {
+      nivel: 0,
+      ativo: false,
+      porSegundo: 0,
+      tempo: 20,
+      tempoAtual: 0,
+      upgrades: {
+        quantidade: { nivel: 0, custo: 200 },
+        tempo: { nivel: 0, custo: 300 },
+      },
+      custo: 100,
+    },
+    upgradeClick: { nivel: 0, custo: 200 },
+  },
+  {
+    nome: "Ferro",
+    id: "ferro",
+    img: "iron.png",
+    quantidade: 0,
+    porClick: 1,
+    desbloqueado: false,
+    desbloqueioRequisito: 200,
+    desbloqueioRecurso: "cobre",
+    valorVenda: 5,
+    gerador: {
+      nivel: 0,
+      ativo: false,
+      porSegundo: 0,
+      tempo: 20,
+      tempoAtual: 0,
+      upgrades: {
+        quantidade: { nivel: 0, custo: 400 },
+        tempo: { nivel: 0, custo: 600 },
+      },
+      custo: 200,
+    },
+    upgradeClick: { nivel: 0, custo: 400 },
+  },
 ];
 
-let moedas = 1000;
-let rebirths = 0; // Contador de rebirths
+let resources = JSON.parse(JSON.stringify(baseResources));
 
-const materiaisDiv = document.getElementById("materiais");
-const moedasDiv = document.getElementById("moedas");
+const container = document.getElementById("resourcesContainer");
 
-// Função para calcular multiplicador de produção (por rebirths)
-function multiplicador() {
-  return 1 + rebirths * 0.10; // +10% por rebirth
-}
+function atualizarDisplay() {
+  container.innerHTML = "";
 
-function atualizarInterface() {
-  moedasDiv.textContent = `Moedas: ${moedas} | Rebirths: ${rebirths}`;
-
-  materiaisDiv.innerHTML = "";
-
-  baseResources.forEach((r, i) => {
-    if (!r.desbloqueado && r.desbloqueioRecurso) {
-      const req = baseResources.find(x => x.id === r.desbloqueioRecurso);
-      if (req && req.quantidade >= r.desbloqueioRequisito) {
-        r.desbloqueado = true;
-      }
-    }
-
-    if (r.desbloqueado) {
-      const div = document.createElement("div");
-      div.className = "material";
-
-      div.innerHTML = `
-        <h3>${r.nome}</h3>
-        <img src="${r.img}" alt="${r.nome}" onclick="clicar(${i})" />
-        <p>Qtd: ${r.quantidade}</p>
-        <p>+${(r.porClick * multiplicador()).toFixed(2)}/click</p>
-        <button onclick="vender(${i})">Vender 1 por ${r.valorVenda} moedas</button><br/>
-        <button onclick="upgradeClick(${i})">Up Click (${r.upgradeClick.custo} moedas)</button><br/>
-        <h4>Gerador</h4>
-        <button onclick="comprarGerador(${i})">${r.gerador.ativo ? "Ativado" : "Comprar"} (${r.gerador.custo} moedas)</button><br/>
-        <button onclick="upgradeGerador(${i}, 'quantidade')">+Qtd (${r.gerador.upgrades.quantidade.custo} moedas)</button>
-        <button onclick="upgradeGerador(${i}, 'tempo')">-Tempo (${r.gerador.upgrades.tempo.custo} moedas)</button>
-      `;
-
-      materiaisDiv.appendChild(div);
+  // desbloquear novos recursos
+  resources.forEach((r, i) => {
+    if (
+      !r.desbloqueado &&
+      resources.find((res) => res.id === r.desbloqueioRecurso).quantidade >=
+        r.desbloqueioRequisito
+    ) {
+      r.desbloqueado = true;
     }
   });
 
-  // Botão de rebirth
-  let btnRebirth = document.getElementById("btnRebirth");
-  if (!btnRebirth) {
-    btnRebirth = document.createElement("button");
-    btnRebirth.id = "btnRebirth";
-    btnRebirth.style.marginTop = "20px";
-    btnRebirth.textContent = "Rebirth (Resetar para +10% produção) - custa 10 moedas";
-    btnRebirth.onclick = rebirth;
-    document.body.appendChild(btnRebirth);
-  }
-  btnRebirth.disabled = moedas < 10;
+  // Mostrar recursos desbloqueados
+  resources.forEach((r, i) => {
+    if (!r.desbloqueado) return;
+
+    const div = document.createElement("div");
+    div.className = "material";
+    div.innerHTML = `
+      <h3>${r.nome}</h3>
+      <img src="${r.img}" onclick="clicar(${i})" />
+      <p>Qtd: ${r.quantidade}</p>
+      <p>+${r.porClick}/click</p>
+      <button onclick="vender(${i})">Vender 100 por ${r.valorVenda} moedas</button><br/>
+      <button onclick="upgradeClick(${i})">Up Click (${r.upgradeClick.custo})</button><br/>
+      <h4>Gerador</h4>
+      <button onclick="comprarGerador(${i})">${r.gerador.ativo ? "Ativado" : "Comprar"} (${r.gerador.custo})</button><br/>
+      <button onclick="upgradeGerador(${i}, 'quantidade')">+Qtd (${r.gerador.upgrades.quantidade.custo})</button>
+      <button onclick="upgradeGerador(${i}, 'tempo')">-Tempo (${r.gerador.upgrades.tempo.custo})</button>
+    `;
+
+    container.appendChild(div);
+  });
+
+  document.getElementById("moedasDisplay").textContent = `Moedas: ${moedas}`;
+  document.getElementById("rebirthDisplay").textContent = `Rebirths: ${rebirthCount}`;
 }
 
-// Clicar no recurso
+// Clique no recurso para ganhar
 function clicar(i) {
-  const r = baseResources[i];
-  r.quantidade += r.porClick * multiplicador();
-  atualizarInterface();
+  const r = resources[i];
+  r.quantidade += r.porClick;
+  atualizarDisplay();
 }
 
 // Vender 100 unidades
 function vender(i) {
-  const r = baseResources[i];
-  if (r.quantidade >= 1) {
-    r.quantidade -= 1;
+  const r = resources[i];
+  if (r.quantidade >= 100) {
+    r.quantidade -= 100;
     moedas += r.valorVenda;
-    atualizarInterface();
-  } else {
-    alert(`Você não tem 1 unidades de ${r.nome} para vender.`);
+    atualizarDisplay();
   }
 }
 
-// Comprar ativar gerador
-function comprarGerador(i) {
-  const r = baseResources[i];
-  if (!r.gerador.ativo) {
-    if (moedas >= r.gerador.custo) {
-      moedas -= r.gerador.custo;
-      r.gerador.ativo = true;
-      r.gerador.nivel = 1;
-      atualizarInterface();
-    } else {
-      alert("Moedas insuficientes para comprar o gerador.");
-    }
-  } else {
-    alert("Gerador já ativado.");
-  }
-}
-
-// Upgrade de clique
+// Upgrade +1 por click do recurso (comprado com moedas)
 function upgradeClick(i) {
-  const r = baseResources[i];
+  const r = resources[i];
   if (moedas >= r.upgradeClick.custo) {
     moedas -= r.upgradeClick.custo;
     r.upgradeClick.nivel++;
     r.porClick++;
+    // Aumentar custo para próximo upgrade (fórmula exponencial)
     r.upgradeClick.custo = Math.floor(r.upgradeClick.custo * 1.5);
-    atualizarInterface();
-  } else {
-    alert("Moedas insuficientes para upgrade de clique.");
+    atualizarDisplay();
   }
 }
 
-// Upgrade gerador (quantidade ou tempo)
+// Comprar ou ativar gerador automático
+function comprarGerador(i) {
+  const r = resources[i];
+  if (!r.gerador.ativo && moedas >= r.gerador.custo) {
+    moedas -= r.gerador.custo;
+    r.gerador.ativo = true;
+    r.gerador.porSegundo = 1 + r.gerador.upgrades.quantidade.nivel;
+    atualizarDisplay();
+  }
+}
+
+// Upgrades do gerador (quantidade e tempo)
 function upgradeGerador(i, tipo) {
-  const r = baseResources[i];
-  const upgrade = r.gerador.upgrades[tipo];
-
-  if (moedas >= upgrade.custo) {
-    moedas -= upgrade.custo;
-    upgrade.nivel++;
-    upgrade.custo = Math.floor(upgrade.custo * 1.7);
-    atualizarInterface();
-  } else {
-    alert(`Moedas insuficientes para upgrade de ${tipo}.`);
+  const r = resources[i];
+  const up = r.gerador.upgrades[tipo];
+  if (moedas >= up.custo && r.gerador.ativo) {
+    moedas -= up.custo;
+    up.nivel++;
+    if (tipo === "quantidade") {
+      r.gerador.porSegundo++;
+    } else if (tipo === "tempo") {
+      r.gerador.tempo = Math.max(1, r.gerador.tempo * 0.9);
+    }
+    // Aumentar custo para próximo upgrade
+    up.custo = Math.floor(up.custo * 1.7);
+    atualizarDisplay();
   }
 }
 
-// Função rebirth
-function rebirth() {
-  if (moedas < 10) {
-    alert("Você precisa de pelo menos 10 moedas para fazer rebirth.");
-    return;
-  }
-  if (confirm("Tem certeza que deseja reiniciar seu progresso para ganhar +10% de produção permanente?")) {
-    moedas = 0;
-    rebirths++;
-    // Resetar todos os recursos
-    baseResources.forEach(r => {
-      r.quantidade = 0;
-      r.porClick = 1 + r.upgradeClick.nivel; // reset base + upgrades de clique
-      r.gerador.ativo = false;
-      r.gerador.nivel = 0;
-      r.gerador.upgrades.quantidade.nivel = 0;
-      r.gerador.upgrades.quantidade.custo = (r.id === "grama") ? 10 : r.gerador.upgrades.quantidade.custo;
-      r.gerador.upgrades.tempo.nivel = 0;
-      r.gerador.upgrades.tempo.custo = (r.id === "grama") ? 15 : r.gerador.upgrades.tempo.custo;
-      r.upgradeClick.custo = (r.id === "grama") ? 10 : r.upgradeClick.custo;
-      r.desbloqueado = r.id === "grama" ? true : false; // só grama desbloqueado
-    });
-    atualizarInterface();
-  }
-}
-
-// Atualização periódica dos geradores (cada 3s)
-setInterval(() => {
-  baseResources.forEach(r => {
-    if (r.gerador.ativo) {
-      // Produção por segundo (3s aqui) com multiplicador e upgrade de quantidade
-      const producao = (1 + r.gerador.upgrades.quantidade.nivel) * multiplicador();
-      r.quantidade += producao;
+// Vender tudo que tiver 100+
+function venderTudo() {
+  resources.forEach((r) => {
+    while (r.quantidade >= 100) {
+      r.quantidade -= 100;
+      moedas += r.valorVenda;
     }
   });
-  atualizarInterface();
-}, 3000);
+  atualizarDisplay();
+}
 
-atualizarInterface();
+// Rebirth - reset total para ganhos multiplicados (simplificado)
+function rebirth() {
+  if (moedas < 1000) return alert("Você precisa de pelo menos 1000 moedas para Rebirth!");
+
+  rebirthCount++;
+  moedas = 0;
+  resources = JSON.parse(JSON.stringify(baseResources));
+  resources.forEach((r) => {
+    r.desbloqueado = r.id === "grama"; // só liberar grama
+    r.quantidade = 0;
+    r.porClick = 1 + rebirthCount; // bônus de porClick a cada rebirth
+    r.upgradeClick.nivel = 0;
+    r.upgradeClick.custo = 10;
+    r.gerador.nivel = 0;
+    r.gerador.ativo = false;
+    r.gerador.porSegundo = 0;
+    r.gerador.tempo = 20;
+    r.gerador.tempoAtual = 0;
+    r.gerador.upgrades.quantidade.nivel = 0;
+    r.gerador.upgrades.quantidade.custo = 10;
+    r.gerador.upgrades.tempo.nivel = 0;
+    r.gerador.upgrades.tempo.custo = 15;
+  });
+
+  atualizarDisplay();
+}
+
+document.getElementById("btnVenderTudo").addEventListener("click", venderTudo);
+document.getElementById("btnRebirth").addEventListener("click", rebirth);
+
+// Loop para atualizar geradores
+function loop() {
+  const deltaTime = 0.1; // segundos
+  resources.forEach((r) => {
+    if (r.gerador.ativo) {
+      r.gerador.tempoAtual += deltaTime;
+      if (r.gerador.tempoAtual >= r.gerador.tempo) {
+        r.quantidade += r.gerador.porSegundo;
+        r.gerador.tempoAtual = 0;
+      }
+    }
+  });
+  atualizarDisplay();
+}
+
+setInterval(loop, 100);
+
+atualizarDisplay();
