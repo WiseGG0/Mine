@@ -40,7 +40,7 @@ function atualizarInterface() {
         <img src="${r.img}" alt="${r.nome}" onclick="clicar(${i})" />
         <p>Qtd: ${r.quantidade}</p>
         <p>+${(r.porClick * multiplicador()).toFixed(2)}/click</p>
-        <button onclick="vender(${i})">Vender 100 por ${r.valorVenda} moedas</button><br/>
+        <button onclick="vender(${i})">Vender 1 por ${r.valorVenda} moedas</button><br/>
         <button onclick="upgradeClick(${i})">Up Click (${r.upgradeClick.custo} moedas)</button><br/>
         <h4>Gerador</h4>
         <button onclick="comprarGerador(${i})">${r.gerador.ativo ? "Ativado" : "Comprar"} (${r.gerador.custo} moedas)</button><br/>
@@ -58,11 +58,11 @@ function atualizarInterface() {
     btnRebirth = document.createElement("button");
     btnRebirth.id = "btnRebirth";
     btnRebirth.style.marginTop = "20px";
-    btnRebirth.textContent = "Rebirth (Resetar para +10% produção) - custa 1000 moedas";
+    btnRebirth.textContent = "Rebirth (Resetar para +10% produção) - custa 10 moedas";
     btnRebirth.onclick = rebirth;
     document.body.appendChild(btnRebirth);
   }
-  btnRebirth.disabled = moedas < 1000;
+  btnRebirth.disabled = moedas < 10;
 }
 
 // Clicar no recurso
@@ -80,7 +80,7 @@ function vender(i) {
     moedas += r.valorVenda;
     atualizarInterface();
   } else {
-    alert(`Você não tem 100 unidades de ${r.nome} para vender.`);
+    alert(`Você não tem 1 unidades de ${r.nome} para vender.`);
   }
 }
 
@@ -132,8 +132,8 @@ function upgradeGerador(i, tipo) {
 
 // Função rebirth
 function rebirth() {
-  if (moedas < 1000) {
-    alert("Você precisa de pelo menos 1000 moedas para fazer rebirth.");
+  if (moedas < 10) {
+    alert("Você precisa de pelo menos 10 moedas para fazer rebirth.");
     return;
   }
   if (confirm("Tem certeza que deseja reiniciar seu progresso para ganhar +10% de produção permanente?")) {
